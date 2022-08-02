@@ -1,11 +1,8 @@
 package com.javaproject.demo.DAO;
-
 import com.javaproject.demo.demoRestAPI.Employee;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-
 import javax.persistence.*;
 import javax.transaction.Transactional;
 import java.util.List;
@@ -18,7 +15,6 @@ public class EmployeeDAO implements IEmployeeDAO{
     public EmployeeDAO(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
-
 
     @Override
     @Transactional
@@ -55,6 +51,5 @@ public class EmployeeDAO implements IEmployeeDAO{
         Employee employee=session.get(Employee.class,id);
         return  employee;
     }
-
 
 }

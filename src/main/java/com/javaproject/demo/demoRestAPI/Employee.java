@@ -1,6 +1,6 @@
 package com.javaproject.demo.demoRestAPI;
 import javax.annotation.processing.Generated;
-import javax.persistence.Entity;
+
 import javax.persistence.*;
 
 @Entity
