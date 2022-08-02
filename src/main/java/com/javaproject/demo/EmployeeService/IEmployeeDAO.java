@@ -1,4 +1,4 @@
-package com.javaproject.demo.DAO;
+package com.javaproject.demo.EmployeeService;
 import com.javaproject.demo.demoRestAPI.Employee;
 import java.util.List;
 
