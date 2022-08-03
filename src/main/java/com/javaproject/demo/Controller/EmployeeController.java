@@ -1,13 +1,12 @@
 package com.javaproject.demo.Controller;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.javaproject.demo.EmployeeService.IEmployeeDAO;
 import com.javaproject.demo.Repository.IEmployeeRepository;
 import com.javaproject.demo.demoRestAPI.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.domain.Sort;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Iterator;
@@ -19,19 +18,36 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api")
 public class EmployeeController{
+    @SpringBootApplication(exclude = {SecurityAutoConfiguration.class })
+    public class ReportApplication {
+
+        public static void main(String[] args) throws Exception {
+            SpringApplication.run(Employee.class, args);
+        }
+    }
+
     Employee employee=new Employee();
-    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
+
     private IEmployeeDAO iEmployeeDAO;
     private IEmployeeRepository iEmployeeRepository;
 
     @PostMapping("/save")
     public void save(@RequestBody Employee employee){
-        iEmployeeRepository.save(employee);
+        try{
+            iEmployeeRepository.save(employee);
+        }catch(org.hibernate.exception.ConstraintViolationException exception){
+           System.out.println(exception+" This pin already exists!");
+        }
+
     }
 
     @PostMapping("/up")
     public void up(@RequestBody Employee employee){
-        iEmployeeRepository.save(employee);
+        try{
+            iEmployeeRepository.save(employee);
+        }catch(org.hibernate.exception.ConstraintViolationException exception){
+            System.out.println(exception+" This pin is already exist!");
+        }
     }
 
     @PostMapping("/deleteall")
@@ -63,7 +79,12 @@ public class EmployeeController{
 
     @PostMapping("/add")
     public void add(@RequestBody Employee employee){
-        iEmployeeDAO.add(employee);
+        try{
+            iEmployeeDAO.add(employee);
+        }catch(org.hibernate.exception.ConstraintViolationException exception){
+            System.out.println(exception+" This pin is already exist!");
+        }
+
     }
 
     @PostMapping("/update")
