@@ -1,16 +1,22 @@
 package com.javaproject.demo.Controller;
+import com.javaproject.demo.APIErrors.BusinessException;
 import com.javaproject.demo.EmployeeService.IEmployeeDAO;
 import com.javaproject.demo.Repository.IEmployeeRepository;
+import com.javaproject.demo.RestApiException.ControllerException;
 import com.javaproject.demo.demoRestAPI.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @SpringBootApplication
@@ -32,38 +38,76 @@ public class EmployeeController{
     private IEmployeeRepository iEmployeeRepository;
 
     @PostMapping("/save")
-    public void save(@RequestBody Employee employee){
-        try{
-            iEmployeeRepository.save(employee);
-        }catch(org.hibernate.exception.ConstraintViolationException exception){
-           System.out.println(exception+" This pin already exists!");
+    public ResponseEntity<?> addEmployee(@RequestBody Employee employee){
+        try {
+            Employee employeeSaved = iEmployeeRepository.save(employee);
+            return new ResponseEntity<Employee>(employeeSaved, HttpStatus.CREATED);
+        }catch (Exception e) {
+            ControllerException ce = new ControllerException("349","Something went wrong in controller");
+            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
         }
-
     }
 
     @PostMapping("/up")
-    public void up(@RequestBody Employee employee){
-        try{
-            iEmployeeRepository.save(employee);
-        }catch(org.hibernate.exception.ConstraintViolationException exception){
-            System.out.println(exception+" This pin is already exist!");
+    public ResponseEntity<Void> saveNewEmployee(@RequestBody Employee employee) {
+        if (Objects.isNull(employee.getId()) || Objects.isNull(employee.getPin())) {
+            throw new IllegalArgumentException("Invalid request");
         }
+
+        return new ResponseEntity<Void>(HttpStatus.CREATED);
     }
 
-    @PostMapping("/deleteall")
-    public void deleteall(){
-        iEmployeeRepository.deleteAllInBatch();
+    @GetMapping("/all")
+    public ResponseEntity<List<Employee>> getAllEmployees(){
+
+        List<Employee> listOfAllEmps = iEmployeeRepository.findAll();
+        return new ResponseEntity<List<Employee>>(listOfAllEmps, HttpStatus.OK);
     }
 
-    @GetMapping("/get/{id}")
-    public Optional< Employee > findById(@PathVariable int id) {
-        return iEmployeeRepository.findById(id);
+
+
+        @GetMapping("/get/{id}")
+        public ResponseEntity<Employee> getEmployeeById(@PathVariable Integer id) {
+
+            try {
+                Employee employeeSaved = iEmployeeRepository.save(employee);
+                return new ResponseEntity<Employee>(employeeSaved, HttpStatus.CREATED);
+            }catch (BusinessException e) {
+                ControllerException ce = new ControllerException("233",e.getErrorMessage());
+                return new ResponseEntity<Employee>((MultiValueMap<String, String>) ce, HttpStatus.BAD_REQUEST);
+            }catch (Exception e) {
+                ControllerException ce = new ControllerException("611","Something went wrong in controller");
+                return new ResponseEntity<Employee>((MultiValueMap<String, String>) ce, HttpStatus.BAD_REQUEST);
+            }
+
+
+        }
+
+
+
+
+    @DeleteMapping("/delete/{empid}")
+    public ResponseEntity<Void> deleteEmpById(@PathVariable("empid") int empidL){
+
+        iEmployeeRepository.deleteById(empidL);
+        return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("/get")
-    public List< Employee > findall() {
-        return iEmployeeRepository.findAll();
+    @PostMapping("/update")
+    public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee){
+        try{
+            Employee employeeSaved = iEmployeeRepository.save(employee);
+            return new ResponseEntity<Employee>(employeeSaved, HttpStatus.CREATED);
+        }catch (Exception E){
+            ControllerException ce = new ControllerException("611","Something went wrong in update");
+            return new ResponseEntity<Employee>((MultiValueMap<String, String>) ce, HttpStatus.CREATED);
+        }
+
+
     }
+
+
+
 
 
 
@@ -72,34 +116,7 @@ public class EmployeeController{
         this.iEmployeeDAO = iEmployeeDAO;
         this.iEmployeeRepository = iEmployeeRepository;
     }
-    @GetMapping("/employee")
-    public List<Employee> get(){
-        return iEmployeeDAO.getAll();
-    }
-
-    @PostMapping("/add")
-    public void add(@RequestBody Employee employee){
-        try{
-            iEmployeeDAO.add(employee);
-        }catch(org.hibernate.exception.ConstraintViolationException exception){
-            System.out.println(exception+" This pin is already exist!");
-        }
-
-    }
-
-    @PostMapping("/update")
-    public void update(@RequestBody Employee employee){
-        iEmployeeDAO.update(employee);
-    }
-
-    @PostMapping("/delete")
-    public void delete(@RequestBody Employee employee){
-        iEmployeeDAO.delete(employee);
-    }
-    @GetMapping("/employee/{id}")
-    public Employee getById(@PathVariable int id){
-        return  iEmployeeDAO.getById(id);
-    }
-
-
 }
+
+
+
