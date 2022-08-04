@@ -66,44 +66,39 @@ public class EmployeeController{
 
 
 
-        @GetMapping("/get/{id}")
-        public ResponseEntity<Employee> getEmployeeById(@PathVariable Integer id) {
-
-            try {
-                Employee employeeSaved = iEmployeeRepository.save(employee);
-                return new ResponseEntity<Employee>(employeeSaved, HttpStatus.CREATED);
-            }catch (BusinessException e) {
-                ControllerException ce = new ControllerException("233",e.getErrorMessage());
-                return new ResponseEntity<Employee>((MultiValueMap<String, String>) ce, HttpStatus.BAD_REQUEST);
-            }catch (Exception e) {
-                ControllerException ce = new ControllerException("611","Something went wrong in controller");
-                return new ResponseEntity<Employee>((MultiValueMap<String, String>) ce, HttpStatus.BAD_REQUEST);
-            }
-
-
+    @GetMapping("/all/{id}")
+    public ResponseEntity<?> getEmpById(@PathVariable("id") long id){
+        try {
+            Employee empRetrieved = iEmployeeRepository.getReferenceById(id);
+            return new ResponseEntity<Employee>(empRetrieved, HttpStatus.OK);
+        }catch (BusinessException e) {
+            ControllerException ce = new ControllerException(e.getErrorCode(),e.getErrorMessage());
+            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
+        }catch (Exception e) {
+            ControllerException ce = new ControllerException("612","Something went wrong in controller");
+            return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
         }
+    }
 
 
 
 
     @DeleteMapping("/delete/{empid}")
-    public ResponseEntity<Void> deleteEmpById(@PathVariable("empid") int empidL){
+    public ResponseEntity<Void> deleteEmpById(@PathVariable("empid") long empidL){
 
         iEmployeeRepository.deleteById(empidL);
         return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee){
         try{
             Employee employeeSaved = iEmployeeRepository.save(employee);
             return new ResponseEntity<Employee>(employeeSaved, HttpStatus.CREATED);
         }catch (Exception E){
-            ControllerException ce = new ControllerException("611","Something went wrong in update");
-            return new ResponseEntity<Employee>((MultiValueMap<String, String>) ce, HttpStatus.CREATED);
+            ControllerException ce = new ControllerException("111","Something went wrong in controller");
+            return new ResponseEntity<Employee>((MultiValueMap<String, String>) ce, HttpStatus.BAD_REQUEST);
         }
-
-
     }
 
 
