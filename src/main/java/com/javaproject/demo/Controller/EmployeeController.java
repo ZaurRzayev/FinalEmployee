@@ -67,12 +67,12 @@ public class EmployeeController{
 
 
     @GetMapping("/all/{id}")
-    public ResponseEntity<?> getEmpById(@PathVariable("id") long id){
+    public ResponseEntity<?> getEmpById(@PathVariable("id") int id){
         try {
-            Employee empRetrieved = iEmployeeRepository.getReferenceById(id);
+            Employee empRetrieved = iEmployeeRepository.findById(id).get();
             return new ResponseEntity<Employee>(empRetrieved, HttpStatus.OK);
         }catch (BusinessException e) {
-            ControllerException ce = new ControllerException(e.getErrorCode(),e.getErrorMessage());
+            ControllerException ce = new ControllerException("619","Something went wrong in controller");
             return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
         }catch (Exception e) {
             ControllerException ce = new ControllerException("612","Something went wrong in controller");
@@ -84,7 +84,7 @@ public class EmployeeController{
 
 
     @DeleteMapping("/delete/{empid}")
-    public ResponseEntity<Void> deleteEmpById(@PathVariable("empid") long empidL){
+    public ResponseEntity<Void> deleteEmpById(@PathVariable("empid") int empidL){
 
         iEmployeeRepository.deleteById(empidL);
         return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
